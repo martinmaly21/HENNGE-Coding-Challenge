@@ -52,10 +52,10 @@ const formatRecipientsForDisplay = () => {
 
     badgeNumber.value = 0;
     for (const [index, recipient] of props.recipients.entries()) {
-        let isLastRecipient = index === props.recipients.length - 1
+        const isLastRecipient = index === props.recipients.length - 1
         //add a comma and space to all array elements other than the last one
-        let recipientText = isLastRecipient ? recipient : `${recipient}, `;
-        let widthOfRecipient = calculateWidthOfText(recipientText);
+        const recipientText = isLastRecipient ? recipient : `${recipient}, `;
+        const widthOfRecipient = calculateWidthOfText(recipientText);
 
         //check if there's enough space to display entire recipient email (+ '...' if there will be a recipient following it )
         if (totalAvailableContainerWidth > widthOfRecipient + (isLastRecipient ? 0 : widthOfEllipses)) {
@@ -63,7 +63,11 @@ const formatRecipientsForDisplay = () => {
             totalAvailableContainerWidth -= widthOfRecipient;
         } else {
             recipientsString += "...";
-            badgeNumber.value = (props.recipients.length) - index;
+            const isFirstRecipient = index === 0;
+            const numberOfHiddenRecipients = (props.recipients.length) - index
+            //if there is not enough space to show the first recipient, we subtract 1 to exclude the first recipient from the badge
+            const badgeNumberValue = isFirstRecipient ?  numberOfHiddenRecipients - 1 :  numberOfHiddenRecipients;
+            badgeNumber.value = badgeNumberValue;
             break; // No more space, so exit the loop
         }
     }
