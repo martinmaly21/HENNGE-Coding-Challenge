@@ -38,28 +38,26 @@ This method uses the current width of the RecipientsDisplay container to conditi
 */
 const formatRecipientsForDisplay = () => {
     //stores the current width of the RecipientsDisplay container
-    const leftContainerPadding = 0; // i think i can remove
-    const rightContainerPadding = 0; //i think i can remove
-    const containerWidth = (container.value?.clientWidth || 0) - leftContainerPadding - rightContainerPadding;
+    const containerWidth = (container.value?.clientWidth || 0);
 
     const leftBadgeContainerPadding = 5;
     const rightBadgeContainerPadding = 5;
     const badgeTextWidth = 0; //TODO: how to calculate? 
     const badgeWidth = leftBadgeContainerPadding + rightBadgeContainerPadding + badgeTextWidth;
 
-    var totalAvailableContainerWidth = containerWidth - leftContainerPadding - rightContainerPadding;
+    var totalAvailableContainerWidth = containerWidth;
 
-
-    let currentWidth = 0;
     let recipientsString = '';
-
     let widthOfEllipses = calculateWidthOfText("...");
 
     for (const [index, recipient] of props.recipients.entries()) {
-        let recipientText = index === props.recipients.length - 1 ? recipient : `${recipient}, `;
+        let isLastRecipient = index === props.recipients.length - 1
+        //add a comma and space to all array elements other than the last one
+        let recipientText = isLastRecipient ? recipient : `${recipient}, `;
         let widthOfRecipient = calculateWidthOfText(recipientText);
 
-        if (totalAvailableContainerWidth > widthOfRecipient + (index === props.recipients.length - 1 ? 0 : widthOfEllipses)) {
+        //check if there's enough space to display entire recipient email (+ '...' if there will be a recipient following it )
+        if (totalAvailableContainerWidth > widthOfRecipient + (isLastRecipient ? 0 : widthOfEllipses)) {
             recipientsString += recipientText;
             totalAvailableContainerWidth -= widthOfRecipient;
         } else {
