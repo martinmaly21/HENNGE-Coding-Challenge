@@ -50,6 +50,7 @@ const formatRecipientsForDisplay = () => {
     let recipientsString = '';
     let widthOfEllipses = calculateWidthOfText("...");
 
+    badgeNumber.value = 0;
     for (const [index, recipient] of props.recipients.entries()) {
         let isLastRecipient = index === props.recipients.length - 1
         //add a comma and space to all array elements other than the last one
@@ -62,6 +63,7 @@ const formatRecipientsForDisplay = () => {
             totalAvailableContainerWidth -= widthOfRecipient;
         } else {
             recipientsString += "...";
+            badgeNumber.value = (props.recipients.length) - index;
             break; // No more space, so exit the loop
         }
     }
@@ -92,11 +94,11 @@ onUnmounted(() => {
 
 <style scoped>
     .recipients-container {
-
+        
     }
 
     .recipients-text {
-
+        
     }
 
     .badge {
