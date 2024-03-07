@@ -62,8 +62,11 @@ const formatRecipientsForDisplay = () => {
             recipientsString += recipientText;
             totalAvailableContainerWidth -= widthOfRecipient;
         } else {
-            recipientsString += "...";
             const isFirstRecipient = index === 0;
+            recipientsString += isFirstRecipient ? recipient : "...";
+
+            //TODO: consider setting display of 'recipients-container' to inline
+
             const numberOfHiddenRecipients = (props.recipients.length) - index
             //if there is not enough space to show the first recipient, we subtract 1 to exclude the first recipient from the badge
             const badgeNumberValue = isFirstRecipient ?  numberOfHiddenRecipients - 1 :  numberOfHiddenRecipients;
@@ -98,14 +101,22 @@ onUnmounted(() => {
 
 <style scoped>
     .recipients-container {
-        
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: red;
     }
 
     .recipients-text {
-        
+        font-size: 16px;
+        color: #333333;
     }
 
     .badge {
-        
+        font-size: 16px;
+        color: #f0f0f0;
+        background-color: #666666;
+        border-radius: 3px;
+        padding: 2px 5px;
     }
 </style>
