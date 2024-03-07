@@ -33,8 +33,15 @@ const calculateWidthOfTextForElement = (text: string, elementID: string) => {
 
     initializeCanvasIfNeeded(); // Ensure canvas is initialized
 
-    if (reusableContext && measureElement) {
-        reusableContext.font = "16px";
+    if (reusableCanvas && reusableContext && measureElement) {
+        const style = window.getComputedStyle(measureElement, null)
+        const fontSizePropertyValue = style.getPropertyValue('font-size');
+        const fontFamilyPropertyValue = style.getPropertyValue('font-family');
+        const fontSize = parseFloat(fontSizePropertyValue); 
+        const fontFamily = fontFamilyPropertyValue.split(', ')[0]
+
+        console.log(`fontSize: ${fontSize}`);
+        reusableContext.font = `${fontSize}px ${fontFamily}`; // Set the font to the desired value
         const metrics = reusableContext.measureText(text);
         widthOfText = metrics.width;
     } else {
@@ -43,6 +50,7 @@ const calculateWidthOfTextForElement = (text: string, elementID: string) => {
     }
     return widthOfText
 };
+
 
 /*
 This method uses the current width of the RecipientsDisplay container to conditionally update the values of 'displayedRecipients' and 'badgeNumber' such that the UI follows the following specs:
