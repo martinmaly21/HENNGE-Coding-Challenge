@@ -15,6 +15,7 @@ const displayedRecipients = ref('');
 // Will store the integer value of the number of hidden recipients for a given Email Audit entry
 const badgeNumber = ref(0);
 
+//method for initializing canvas that will be used for measuring UI elements
 function initializeCanvasIfNeeded() {
     if (!reusableCanvas) {
         reusableCanvas = document.createElement('canvas');
@@ -25,22 +26,21 @@ function initializeCanvasIfNeeded() {
     }
 }
 
-//This method is responsible for calculating the width a given html element when it's populated with a given string. It takes in the string and the element ID, and returns the width in pixels.
+//This method is responsible for calculating the width for a HTML element when it's populated with a given string. It takes in the string and the element ID, and returns the width in pixels.
 const calculateWidthOfTextForElement = (text: string, elementID: string) => {
     let widthOfText = 0
-    //get reference to hidden UI element
+    //get reference to UI element
     const measureElement = document.getElementById(elementID);
 
     initializeCanvasIfNeeded(); // Ensure canvas is initialized
 
-    if (reusableCanvas && reusableContext && measureElement) {
+    if (reusableContext && measureElement) {
         const style = window.getComputedStyle(measureElement, null)
         const fontSizePropertyValue = style.getPropertyValue('font-size');
         const fontFamilyPropertyValue = style.getPropertyValue('font-family');
         const fontSize = parseFloat(fontSizePropertyValue); 
         const fontFamily = fontFamilyPropertyValue.split(', ')[0]
-
-        console.log(`fontSize: ${fontSize}`);
+        
         reusableContext.font = `${fontSize}px ${fontFamily}`; // Set the font to the desired value
         const metrics = reusableContext.measureText(text);
         widthOfText = metrics.width;
@@ -61,7 +61,7 @@ This method uses the current width of the RecipientsDisplay container to conditi
 */
 const formatRecipientsForDisplay = () => {
     //stores the current width of the RecipientsDisplay container
-    var totalAvailableContainerWidth = (container.value?.clientWidth || 0);
+    let totalAvailableContainerWidth = (container.value?.clientWidth || 0);
 
     let recipientsString = '';
     let widthOfEllipses = calculateWidthOfTextForElement(", ...", 'recipients-text-measure-element');
@@ -69,21 +69,18 @@ const formatRecipientsForDisplay = () => {
     badgeNumber.value = 0;
     for (const [index, recipient] of props.recipients.entries()) {
         const numberOfHiddenRecipients = (props.recipients.length) - index
-        //TODO: create a method to measure this better using acutal badge width with actual number
         const isFirstRecipient = index === 0;
         const badgeNumberValue = isFirstRecipient ?  numberOfHiddenRecipients - 1 :  numberOfHiddenRecipients;
-        let widthOfBadge = calculateWidthOfTextForElement(`+${numberOfHiddenRecipients.toString()}`, 'badge-measure-element') + 5; // the +5 is to account for the 5px of margin between the badge and recipient
-        console.log(`badgeNumber.value: ${badgeNumberValue}`);
+        const badgeLeftPadding = 2;
+        const badgeRightPadding = 2;
+        const badgeMargin = 5;
+        let widthOfBadge = calculateWidthOfTextForElement(`+${numberOfHiddenRecipients.toString()}`, 'badge-measure-element') + badgeMargin + badgeLeftPadding + badgeRightPadding;
 
         const isLastRecipient = index === props.recipients.length - 1
         //add a comma and space to all array elements other than the last one
         const recipientText = isLastRecipient ? recipient : `${recipient}, `;
         const widthOfRecipient = calculateWidthOfTextForElement(recipientText, 'recipients-text-measure-element');
 
-        console.log(`widthOfEllipses: ${widthOfEllipses}`);
-        console.log(`widthOfBadge: ${widthOfBadge}`);
-        console.log(`widthOfRecipient: ${widthOfRecipient}`);
-        console.log(`totalAvailableContainerWidth: ${totalAvailableContainerWidth}`);
         //check if there's enough space to display entire recipient email (+ '...' if there will be a recipient following it )
         if (totalAvailableContainerWidth > widthOfRecipient + (isLastRecipient ? 0 : widthOfEllipses) + (badgeNumberValue > 0 ? widthOfBadge : 0)) {
             recipientsString += recipientText;
