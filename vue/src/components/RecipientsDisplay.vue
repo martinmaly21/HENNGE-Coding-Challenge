@@ -127,6 +127,7 @@ onUnmounted(() => {
         background-color: #666666;
         border-radius: 3px;
         padding: 2px 5px;
+        margin-left: 5px; /* add spacing between the badge and the recipient emails */
         flex: none;
     }
 </style>
