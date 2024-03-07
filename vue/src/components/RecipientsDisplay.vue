@@ -44,14 +44,7 @@ This method uses the current width of the RecipientsDisplay container to conditi
 */
 const formatRecipientsForDisplay = () => {
     //stores the current width of the RecipientsDisplay container
-    const containerWidth = (container.value?.clientWidth || 0);
-
-    const leftBadgeContainerPadding = 5;
-    const rightBadgeContainerPadding = 5;
-    const badgeTextWidth = 0; //TODO: how to calculate? 
-    const badgeWidth = leftBadgeContainerPadding + rightBadgeContainerPadding + badgeTextWidth;
-
-    var totalAvailableContainerWidth = containerWidth;
+    var totalAvailableContainerWidth = (container.value?.clientWidth || 0);
 
     let recipientsString = '';
     let widthOfEllipses = calculateWidthOfTextForElement(", ...", 'recipients-text-measure-element');
@@ -62,7 +55,7 @@ const formatRecipientsForDisplay = () => {
         //TODO: create a method to measure this better using acutal badge width with actual number
         const isFirstRecipient = index === 0;
         const badgeNumberValue = isFirstRecipient ?  numberOfHiddenRecipients - 1 :  numberOfHiddenRecipients;
-        let widthOfBadge = calculateWidthOfTextForElement(`+${numberOfHiddenRecipients.toString()}`, 'badge-measure-element') - 5;
+        let widthOfBadge = calculateWidthOfTextForElement(`+${numberOfHiddenRecipients.toString()}`, 'badge-measure-element') + 5; // the +5 is to account for the 5px of margin between the badge and recipient
         console.log(`badgeNumber.value: ${badgeNumberValue}`);
         totalAvailableContainerWidth -= (badgeNumberValue > 0 ? widthOfBadge : 0);
 
