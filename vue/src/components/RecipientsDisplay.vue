@@ -37,6 +37,10 @@ This method uses the current width of the RecipientsDisplay container to conditi
 - If there is not enough space to show even the first recipient, the badge should show the number of trimmed recipients excluding the first recipient, and the recipient should be truncated with an ellipsis only. If there is only one recipient, there will be no badge, and the recipient should still be truncated by an ellipsis.
 */
 const formatRecipientsForDisplay = () => {
+    //initially, reset the container style to expected display value
+    //this will be set to 'inline' if we want to trim by character rather than by email
+    if (container.value) container.value.style.display = 'flex';
+
     //stores the current width of the RecipientsDisplay container
     const containerWidth = (container.value?.clientWidth || 0);
 
@@ -65,8 +69,9 @@ const formatRecipientsForDisplay = () => {
             const isFirstRecipient = index === 0;
             recipientsString += isFirstRecipient ? recipient : "...";
 
-            //TODO: consider setting display of 'recipients-container' to inline
-
+            //if there is not enough space even for the one email displayed in UI, we no longer trim by email, we rather trim by character, and thus set the display property to 'inline'
+            if (isFirstRecipient && container.value) container.value.style.display = 'inline';
+           
             const numberOfHiddenRecipients = (props.recipients.length) - index
             //if there is not enough space to show the first recipient, we subtract 1 to exclude the first recipient from the badge
             const badgeNumberValue = isFirstRecipient ?  numberOfHiddenRecipients - 1 :  numberOfHiddenRecipients;
