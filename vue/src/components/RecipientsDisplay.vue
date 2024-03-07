@@ -58,24 +58,31 @@ const formatRecipientsForDisplay = () => {
 
     badgeNumber.value = 0;
     for (const [index, recipient] of props.recipients.entries()) {
+        const numberOfHiddenRecipients = (props.recipients.length) - index
+        //TODO: create a method to measure this better using acutal badge width with actual number
+        const isFirstRecipient = index === 0;
+        const badgeNumberValue = isFirstRecipient ?  numberOfHiddenRecipients - 1 :  numberOfHiddenRecipients;
+        let widthOfBadge = calculateWidthOfTextForElement(`+${numberOfHiddenRecipients.toString()}`, 'badge-measure-element') - 5;
+        console.log(`badgeNumber.value: ${badgeNumberValue}`);
+        totalAvailableContainerWidth -= (badgeNumberValue > 0 ? widthOfBadge : 0);
+
         const isLastRecipient = index === props.recipients.length - 1
         //add a comma and space to all array elements other than the last one
         const recipientText = isLastRecipient ? recipient : `${recipient}, `;
         const widthOfRecipient = calculateWidthOfTextForElement(recipientText, 'recipients-text-measure-element');
 
-        const numberOfHiddenRecipients = (props.recipients.length) - index
-        //TODO: create a method to measure this better using acutal badge width with actual number
-        let widthOfBadge = calculateWidthOfTextForElement(`+${numberOfHiddenRecipients.toString()}`, 'badge-measure-element');
-        console.log(widthOfBadge);
+        console.log(`widthOfEllipses: ${widthOfEllipses}`);
+        console.log(`widthOfBadge: ${widthOfBadge}`);
+        console.log(`widthOfRecipient: ${widthOfRecipient}`);
+        console.log(`totalAvailableContainerWidth: ${totalAvailableContainerWidth}`);
         //check if there's enough space to display entire recipient email (+ '...' if there will be a recipient following it )
-        if (totalAvailableContainerWidth > widthOfRecipient + (badgeNumber.value > 0 ? widthOfBadge : 0) + (isLastRecipient ? 0 : widthOfEllipses)) {
+        if (totalAvailableContainerWidth > widthOfRecipient + (isLastRecipient ? 0 : widthOfEllipses)) {
             recipientsString += recipientText;
             totalAvailableContainerWidth -= (widthOfRecipient);
         } else {
-            const isFirstRecipient = index === 0;
             recipientsString += isFirstRecipient ? recipient : "...";
             //if there is not enough space to show even the first recipient, we subtract 1 to exclude the first recipient from the badge
-            const badgeNumberValue = isFirstRecipient ?  numberOfHiddenRecipients - 1 :  numberOfHiddenRecipients;
+            
             badgeNumber.value = badgeNumberValue;
             break; // No more space, so exit the loop
         }
@@ -100,8 +107,8 @@ onUnmounted(() => {
 <template>
  <div ref="container" class="recipients-container">
     <span class="recipients-text">{{ displayedRecipients }}</span>
-    <span class="recipients-text-measure-element" id="recipients-text-measure-element"></span>
-    <span v-if="badgeNumber > 0" class="badge-measure-element" id="badge-measure-element"></span>
+    <span class="recipients-text" id="recipients-text-measure-element"></span>
+    <span v-if="badgeNumber > 0" class="badge" id="badge-measure-element"></span>
     <span v-if="badgeNumber > 0" class="badge">+{{ badgeNumber }}</span>
  </div>
 </template>
@@ -123,11 +130,6 @@ onUnmounted(() => {
         display: block;
     }
 
-    .recipients-text-measure-element {
-        font-size: 16px;
-        display: none;
-    }
-
     .badge {
         font-size: 16px;
         color: #f0f0f0;
@@ -137,16 +139,5 @@ onUnmounted(() => {
         margin-left: 5px; /* add spacing between the badge and the recipient emails */
         flex: none;
         display: block;
-    }
-
-    .badge-measure-element {
-        font-size: 16px;
-        color: #f0f0f0;
-        background-color: #666666;
-        border-radius: 3px;
-        padding: 2px 5px;
-        margin-left: 5px; /* add spacing between the badge and the recipient emails */
-        flex: none;
-        display: none;
     }
 </style>
