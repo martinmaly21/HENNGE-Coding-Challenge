@@ -93,8 +93,8 @@ onUnmounted(() => {
 
 <template>
  <div ref="container" class="recipients-container">
-    <span class="recipients-text" id="measure-element" style="visibility: hidden; white-space: nowrap;"></span>
     <span class="recipients-text">{{ displayedRecipients }}</span>
+    <span class="recipients-text" id="measure-element" style="visibility: hidden"></span>
     <span v-if="badgeNumber > 0" class="badge">+{{ badgeNumber }}</span>
  </div>
 </template>
