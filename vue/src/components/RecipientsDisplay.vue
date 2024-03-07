@@ -48,7 +48,7 @@ const formatRecipientsForDisplay = () => {
     var totalAvailableContainerWidth = containerWidth;
 
     let recipientsString = '';
-    let widthOfEllipses = calculateWidthOfTextForElement("...", 'recipients-text-measure-element');
+    let widthOfEllipses = calculateWidthOfTextForElement(", ...", 'recipients-text-measure-element');
 
     badgeNumber.value = 0;
     for (const [index, recipient] of props.recipients.entries()) {
@@ -62,9 +62,9 @@ const formatRecipientsForDisplay = () => {
         let widthOfBadge = calculateWidthOfTextForElement(`+${numberOfHiddenRecipients.toString()}`, 'badge-measure-element');
 
         //check if there's enough space to display entire recipient email (+ '...' if there will be a recipient following it )
-        if (totalAvailableContainerWidth > widthOfRecipient + (isLastRecipient ? 0 : widthOfEllipses + widthOfBadge)) {
+        if (totalAvailableContainerWidth > widthOfRecipient + (badgeNumber.value > 0 ? widthOfBadge : 0) + (isLastRecipient ? 0 : widthOfEllipses)) {
             recipientsString += recipientText;
-            totalAvailableContainerWidth -= (widthOfRecipient + (isLastRecipient ? 0 : widthOfEllipses + widthOfBadge));
+            totalAvailableContainerWidth -= (widthOfRecipient);
         } else {
             const isFirstRecipient = index === 0;
             recipientsString += isFirstRecipient ? recipient : "...";
