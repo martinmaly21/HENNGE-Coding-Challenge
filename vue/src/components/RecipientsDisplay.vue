@@ -17,11 +17,17 @@ const calculateWidthOfTextForElement = (text: string, elementID: string) => {
     let widthOfText = 0
     //get reference to hidden UI element
     const measureElement = document.getElementById(elementID);
+
         if (measureElement) {
+            //momentarily set displayStyle so we can get measurement
+            measureElement.style.display = 'block'
             //update the text of the HTML element, and force a layout pass
             measureElement.textContent = text;
             //measure the width of that HTML element populated with the text
             widthOfText = measureElement.offsetWidth;
+
+            //hide measure element
+            measureElement.style.display = 'none'
         } else {
             //if the HTML element could not be retrieved, fallback to a basic calculation where we assume the width of each character to be 8px and add an extra 20px of space for extra allowance
             widthOfText = text.length * 8 + 20
@@ -60,7 +66,7 @@ const formatRecipientsForDisplay = () => {
         const numberOfHiddenRecipients = (props.recipients.length) - index
         //TODO: create a method to measure this better using acutal badge width with actual number
         let widthOfBadge = calculateWidthOfTextForElement(`+${numberOfHiddenRecipients.toString()}`, 'badge-measure-element');
-
+        console.log(widthOfBadge);
         //check if there's enough space to display entire recipient email (+ '...' if there will be a recipient following it )
         if (totalAvailableContainerWidth > widthOfRecipient + (badgeNumber.value > 0 ? widthOfBadge : 0) + (isLastRecipient ? 0 : widthOfEllipses)) {
             recipientsString += recipientText;
@@ -114,11 +120,12 @@ onUnmounted(() => {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        display: block;
     }
 
     .recipients-text-measure-element {
         font-size: 16px;
-        visibility: hidden;
+        display: none;
     }
 
     .badge {
@@ -129,6 +136,7 @@ onUnmounted(() => {
         padding: 2px 5px;
         margin-left: 5px; /* add spacing between the badge and the recipient emails */
         flex: none;
+        display: block;
     }
 
     .badge-measure-element {
@@ -139,6 +147,6 @@ onUnmounted(() => {
         padding: 2px 5px;
         margin-left: 5px; /* add spacing between the badge and the recipient emails */
         flex: none;
-        visibility: hidden;
+        display: none;
     }
 </style>
