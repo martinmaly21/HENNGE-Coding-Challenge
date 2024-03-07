@@ -37,10 +37,6 @@ This method uses the current width of the RecipientsDisplay container to conditi
 - If there is not enough space to show even the first recipient, the badge should show the number of trimmed recipients excluding the first recipient, and the recipient should be truncated with an ellipsis only. If there is only one recipient, there will be no badge, and the recipient should still be truncated by an ellipsis.
 */
 const formatRecipientsForDisplay = () => {
-    //initially, reset the container style to expected display value
-    //this will be set to 'inline' if we want to trim by character rather than by email
-    if (container.value) container.value.style.display = 'flex';
-
     //stores the current width of the RecipientsDisplay container
     const containerWidth = (container.value?.clientWidth || 0);
 
@@ -61,19 +57,18 @@ const formatRecipientsForDisplay = () => {
         const recipientText = isLastRecipient ? recipient : `${recipient}, `;
         const widthOfRecipient = calculateWidthOfText(recipientText);
 
+        const numberOfHiddenRecipients = (props.recipients.length) - index
+        //TODO: create a method to measure this better using acutal badge width
+        let widthOfBadge = calculateWidthOfText("+3");
+
         //check if there's enough space to display entire recipient email (+ '...' if there will be a recipient following it )
-        if (totalAvailableContainerWidth > widthOfRecipient + (isLastRecipient ? 0 : widthOfEllipses)) {
+        if (totalAvailableContainerWidth > widthOfRecipient + (isLastRecipient ? 0 : widthOfEllipses + widthOfBadge)) {
             recipientsString += recipientText;
-            totalAvailableContainerWidth -= widthOfRecipient;
+            totalAvailableContainerWidth -= (widthOfRecipient + (isLastRecipient ? 0 : widthOfEllipses + widthOfBadge));
         } else {
             const isFirstRecipient = index === 0;
             recipientsString += isFirstRecipient ? recipient : "...";
-
-            //if there is not enough space even for the one email displayed in UI, we no longer trim by email, we rather trim by character, and thus set the display property to 'inline'
-            if (isFirstRecipient && container.value) container.value.style.display = 'inline';
-           
-            const numberOfHiddenRecipients = (props.recipients.length) - index
-            //if there is not enough space to show the first recipient, we subtract 1 to exclude the first recipient from the badge
+            //if there is not enough space to show even the first recipient, we subtract 1 to exclude the first recipient from the badge
             const badgeNumberValue = isFirstRecipient ?  numberOfHiddenRecipients - 1 :  numberOfHiddenRecipients;
             badgeNumber.value = badgeNumberValue;
             break; // No more space, so exit the loop
@@ -99,7 +94,7 @@ onUnmounted(() => {
 <template>
  <div ref="container" class="recipients-container">
     <span class="recipients-text">{{ displayedRecipients }}</span>
-    <span class="recipients-text" id="measure-element" style="visibility: hidden"></span>
+    <span class="recipients-text-hidden" id="measure-element"></span>
     <span v-if="badgeNumber > 0" class="badge">+{{ badgeNumber }}</span>
  </div>
 </template>
@@ -115,6 +110,15 @@ onUnmounted(() => {
     .recipients-text {
         font-size: 16px;
         color: #333333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .recipients-text-hidden {
+        font-size: 16px;
+        color: #333333;
+        visibility: hidden;
     }
 
     .badge {
@@ -123,5 +127,6 @@ onUnmounted(() => {
         background-color: #666666;
         border-radius: 3px;
         padding: 2px 5px;
+        flex: none;
     }
 </style>
