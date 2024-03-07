@@ -42,10 +42,11 @@ const calculateWidthOfTextForElement = (text: string, elementID: string) => {
         const fontFamily = fontFamilyPropertyValue.split(', ')[0]
         
         reusableContext.font = `${fontSize}px ${fontFamily}`; // Set the font to the desired value
+
         const metrics = reusableContext.measureText(text);
         widthOfText = metrics.width;
     } else {
-         //if the context could not be retrieved, fallback to a basic calculation where we assume the width of each character to be 8px and add an extra 20px of space for extra allowance
+         //if the context or HTML element could not be retrieved, fallback to a basic calculation where we assume the width of each character to be 8px and add an extra 20px of space for extra allowance
         widthOfText = text.length * 8 + 20
     }
     return widthOfText
@@ -65,8 +66,8 @@ const formatRecipientsForDisplay = () => {
 
     let recipientsString = '';
     let widthOfEllipses = calculateWidthOfTextForElement(", ...", 'recipients-text-measure-element');
-
     badgeNumber.value = 0;
+    
     for (const [index, recipient] of props.recipients.entries()) {
         const numberOfHiddenRecipients = (props.recipients.length) - index
         const isFirstRecipient = index === 0;
@@ -81,14 +82,12 @@ const formatRecipientsForDisplay = () => {
         const recipientText = isLastRecipient ? recipient : `${recipient}, `;
         const widthOfRecipient = calculateWidthOfTextForElement(recipientText, 'recipients-text-measure-element');
 
-        //check if there's enough space to display entire recipient email (+ '...' if there will be a recipient following it )
+        //check if there's enough space to display entire recipient email (+ '...' if there will be a recipient following it), as well as the badge
         if (totalAvailableContainerWidth > widthOfRecipient + (isLastRecipient ? 0 : widthOfEllipses) + (badgeNumberValue > 0 ? widthOfBadge : 0)) {
             recipientsString += recipientText;
-            totalAvailableContainerWidth -= ((widthOfRecipient));
+            totalAvailableContainerWidth -= widthOfRecipient;
         } else {
             recipientsString += isFirstRecipient ? recipient : "...";
-            //if there is not enough space to show even the first recipient, we subtract 1 to exclude the first recipient from the badge
-            
             badgeNumber.value = badgeNumberValue;
             break; // No more space, so exit the loop
         }
@@ -122,7 +121,6 @@ onUnmounted(() => {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: red;
     }
 
     .recipients-text {
