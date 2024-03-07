@@ -12,11 +12,11 @@ const displayedRecipients = ref('');
 // Will store the integer value of the number of hidden recipients for a given Email Audit entry
 const badgeNumber = ref(0);
 
-//This method is responsible for calculating the width of a string UI. It takes in the string, and returns the width in pixels.
-const calculateWidthOfText = (text: string) => {
+//This method is responsible for calculating the width a given html element when it's populated with a given string. It takes in the string and the element ID, and returns the width in pixels.
+const calculateWidthOfTextForElement = (text: string, elementID: string) => {
     let widthOfText = 0
     //get reference to hidden UI element
-    const measureElement = document.getElementById('measure-element');
+    const measureElement = document.getElementById(elementID);
         if (measureElement) {
             //update the text of the HTML element, and force a layout pass
             measureElement.textContent = text;
@@ -48,18 +48,18 @@ const formatRecipientsForDisplay = () => {
     var totalAvailableContainerWidth = containerWidth;
 
     let recipientsString = '';
-    let widthOfEllipses = calculateWidthOfText("...");
+    let widthOfEllipses = calculateWidthOfTextForElement("...", 'recipients-text-measure-element');
 
     badgeNumber.value = 0;
     for (const [index, recipient] of props.recipients.entries()) {
         const isLastRecipient = index === props.recipients.length - 1
         //add a comma and space to all array elements other than the last one
         const recipientText = isLastRecipient ? recipient : `${recipient}, `;
-        const widthOfRecipient = calculateWidthOfText(recipientText);
+        const widthOfRecipient = calculateWidthOfTextForElement(recipientText, 'recipients-text-measure-element');
 
         const numberOfHiddenRecipients = (props.recipients.length) - index
-        //TODO: create a method to measure this better using acutal badge width
-        let widthOfBadge = calculateWidthOfText("+3");
+        //TODO: create a method to measure this better using acutal badge width with actual number
+        let widthOfBadge = calculateWidthOfTextForElement("+3", 'badge-measure-element');
 
         //check if there's enough space to display entire recipient email (+ '...' if there will be a recipient following it )
         if (totalAvailableContainerWidth > widthOfRecipient + (isLastRecipient ? 0 : widthOfEllipses + widthOfBadge)) {
@@ -94,7 +94,8 @@ onUnmounted(() => {
 <template>
  <div ref="container" class="recipients-container">
     <span class="recipients-text">{{ displayedRecipients }}</span>
-    <span class="recipients-text-hidden" id="measure-element"></span>
+    <span class="recipients-text-measure-element" id="recipients-text-measure-element"></span>
+    <span v-if="badgeNumber > 0" class="badge-measure-element" id="badge-measure-element"></span>
     <span v-if="badgeNumber > 0" class="badge">+{{ badgeNumber }}</span>
  </div>
 </template>
@@ -115,9 +116,8 @@ onUnmounted(() => {
         text-overflow: ellipsis;
     }
 
-    .recipients-text-hidden {
+    .recipients-text-measure-element {
         font-size: 16px;
-        color: #333333;
         visibility: hidden;
     }
 
@@ -129,5 +129,16 @@ onUnmounted(() => {
         padding: 2px 5px;
         margin-left: 5px; /* add spacing between the badge and the recipient emails */
         flex: none;
+    }
+
+    .badge-measure-element {
+        font-size: 16px;
+        color: #f0f0f0;
+        background-color: #666666;
+        border-radius: 3px;
+        padding: 2px 5px;
+        margin-left: 5px; /* add spacing between the badge and the recipient emails */
+        flex: none;
+        visibility: hidden;
     }
 </style>
