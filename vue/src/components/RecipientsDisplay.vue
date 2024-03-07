@@ -7,10 +7,23 @@ const props = defineProps<{
 
 //will store reference to the HTML div containing the Email Audit entry data
 const container = ref<HTMLElement | null>(null);
+// a reusable canvas and context object that will be used for measuring text
+let reusableCanvas: HTMLCanvasElement | null = null;
+let reusableContext: CanvasRenderingContext2D | null = null;
 // Will store the string value of recipients displayed in UI for a given Email Audit entry
 const displayedRecipients = ref('');
 // Will store the integer value of the number of hidden recipients for a given Email Audit entry
 const badgeNumber = ref(0);
+
+function initializeCanvasIfNeeded() {
+    if (!reusableCanvas) {
+        reusableCanvas = document.createElement('canvas');
+    }
+
+    if (!reusableContext) {
+        reusableContext = reusableCanvas.getContext('2d');
+    }
+}
 
 //This method is responsible for calculating the width a given html element when it's populated with a given string. It takes in the string and the element ID, and returns the width in pixels.
 const calculateWidthOfTextForElement = (text: string, elementID: string) => {
@@ -18,20 +31,16 @@ const calculateWidthOfTextForElement = (text: string, elementID: string) => {
     //get reference to hidden UI element
     const measureElement = document.getElementById(elementID);
 
-        if (measureElement) {
-            //momentarily set displayStyle so we can get measurement
-            measureElement.style.display = 'block'
-            //update the text of the HTML element, and force a layout pass
-            measureElement.textContent = text;
-            //measure the width of that HTML element populated with the text
-            widthOfText = measureElement.offsetWidth;
+    initializeCanvasIfNeeded(); // Ensure canvas is initialized
 
-            //hide measure element
-            measureElement.style.display = 'none'
-        } else {
-            //if the HTML element could not be retrieved, fallback to a basic calculation where we assume the width of each character to be 8px and add an extra 20px of space for extra allowance
-            widthOfText = text.length * 8 + 20
-        }         
+    if (reusableContext && measureElement) {
+        reusableContext.font = "16px";
+        const metrics = reusableContext.measureText(text);
+        widthOfText = metrics.width;
+    } else {
+         //if the context could not be retrieved, fallback to a basic calculation where we assume the width of each character to be 8px and add an extra 20px of space for extra allowance
+        widthOfText = text.length * 8 + 20
+    }
     return widthOfText
 };
 
@@ -98,10 +107,8 @@ onUnmounted(() => {
 
 <template>
  <div ref="container" class="recipients-container">
-    <span class="recipients-text">{{ displayedRecipients }}</span>
-    <span class="recipients-text" id="recipients-text-measure-element"></span>
-    <span v-if="badgeNumber > 0" class="badge" id="badge-measure-element"></span>
-    <span v-if="badgeNumber > 0" class="badge">+{{ badgeNumber }}</span>
+    <span class="recipients-text" id="recipients-text-measure-element">{{ displayedRecipients }}</span>
+    <span v-if="badgeNumber > 0" class="badge" id="badge-measure-element">+{{ badgeNumber }}</span>
  </div>
 </template>
 
