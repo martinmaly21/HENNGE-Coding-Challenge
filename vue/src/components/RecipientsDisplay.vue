@@ -59,7 +59,7 @@ const formatRecipientsForDisplay = () => {
 
         const numberOfHiddenRecipients = (props.recipients.length) - index
         //TODO: create a method to measure this better using acutal badge width with actual number
-        let widthOfBadge = calculateWidthOfTextForElement("+3", 'badge-measure-element');
+        let widthOfBadge = calculateWidthOfTextForElement(`+${numberOfHiddenRecipients.toString()}`, 'badge-measure-element');
 
         //check if there's enough space to display entire recipient email (+ '...' if there will be a recipient following it )
         if (totalAvailableContainerWidth > widthOfRecipient + (isLastRecipient ? 0 : widthOfEllipses + widthOfBadge)) {
