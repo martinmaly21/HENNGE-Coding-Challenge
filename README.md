@@ -2,7 +2,7 @@
 
 My submission for the frontend challenge for HENNGE.
 
-The challenge details can be found within the `challenge_details` folder.
+The challenge details can be found within [challenge_details](/challenge_details/).
 
 ## Installation
 
